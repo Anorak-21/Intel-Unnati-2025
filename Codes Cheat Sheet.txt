@@ -1,0 +1,133 @@
+
+############# Only for GUI #############
+
+export DISPLAY=//Enter your IP Address here, only applicable if you are running via GUI
+
+
+############# Code to Run Docker #############
+
+docker run -it --rm \
+  -v /mnt/c/Users/Asus/intel/models:/home/dlstreamer/models \
+  --env MODELS_PATH=/home/dlstreamer/models \
+  --env DISPLAY=$DISPLAY \
+  intel/dlstreamer:latest
+
+############# Model 1 #############
+
+export DETECTION_MODEL=/home/dlstreamer/models/intel/person-vehicle-bike-detection-2004/FP16/person-vehicle-bike-detection-2004.xml
+export DETECTION_MODEL_PROC=/opt/intel/dlstreamer/samples/gstreamer/model_proc/intel/person-vehicle-bike-detection-2004.json
+
+############# Model 2 #############
+
+export DETECTION_MODEL=/home/dlstreamer/models/intel/face-detection-0204/FP16/face-detection-0204.xml
+export DETECTION_MODEL_PROC=/opt/intel/dlstreamer/samples/gstreamer/model_proc/intel/face-detection-0204.json
+
+
+############# Export Videos ##########
+
+export VIDEO_1=/home/dlstreamer/models/test.mp4
+export VIDEO_2=/home/dlstreamer/models/test.mp4
+export VIDEO_3=/home/dlstreamer/models/test.mp4
+export VIDEO_4=/home/dlstreamer/models/test.mp4
+
+
+##############################################
+################ Run Final With GUI ##########
+##############################################
+
+####### 1 Stream #########
+
+gst-launch-1.0 \
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! videoconvert ! autovideosink
+
+
+###### 2 Streams #########
+
+gst-launch-1.0 \
+compositor name=comp sink_0::xpos=0 sink_0::ypos=0 sink_1::xpos=640 sink_1::ypos=0 ! \
+video/x-raw,width=1280,height=360 ! videoconvert ! autovideosink sync=false \
+\
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! videoconvert ! comp.sink_0 \
+\
+filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! videoconvert ! comp.sink_1
+
+
+###### 4 Streams #########
+
+gst-launch-1.0 \
+compositor name=comp \
+sink_0::xpos=0 sink_0::ypos=0 \
+sink_1::xpos=640 sink_1::ypos=0 \
+sink_2::xpos=0 sink_2::ypos=360 \
+sink_3::xpos=640 sink_3::ypos=360 ! \
+video/x-raw,width=1280,height=720 ! videoconvert ! autovideosink sync=false \
+\
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! videoconvert ! comp.sink_0 \
+\
+filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! videoconvert ! comp.sink_1 \
+\
+filesrc location=$VIDEO_3 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! videoconvert ! comp.sink_2 \
+\
+filesrc location=$VIDEO_4 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! videoconvert ! comp.sink_3
+
+
+
+##############################################
+################ Run Final Without GUI ########
+##############################################
+
+####### 1 Stream #########
+
+gst-launch-1.0 \
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvafpscounter ! fakesink sync=false
+
+
+###### 2 Stream #########
+
+gst-launch-1.0 \
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! fakesink sync=false \
+\
+filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! fakesink sync=false
+
+
+###### 4 Stream #########
+
+gst-launch-1.0 \
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! fakesink sync=false \
+\
+filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! fakesink sync=false \
+\
+filesrc location=$VIDEO_3 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! fakesink sync=false \
+\
+filesrc location=$VIDEO_4 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! gvafpscounter ! fakesink sync=false
+
+
+

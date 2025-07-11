@@ -1,0 +1,46 @@
+Realtime Input and Output With GUI - Compositor
+
+##WSL
+
+export DISPLAY="Your IP Address"
+
+docker run -it --rm \
+  -v /mnt/c/Users/Asus/intel/models:/home/dlstreamer/models \
+  --env MODELS_PATH=/home/dlstreamer/models \
+  --env DISPLAY=$DISPLAY \
+  intel/dlstreamer:latest
+
+
+export DETECTION_MODEL=/home/dlstreamer/models/intel/person-vehicle-bike-detection-2004/FP16/person-vehicle-bike-detection-2004.xml
+export DETECTION_MODEL_PROC=/opt/intel/dlstreamer/samples/gstreamer/model_proc/intel/person-vehicle-bike-detection-2004.json
+
+
+URL1="Link of youtube video 1 to be pasted here"
+URL2="Link of youtube video 2 to be pasted here"
+
+VIDEO_1_URL=$(yt-dlp -g "$URL1" | head -n1)
+VIDEO_2_URL=$(yt-dlp -g "$URL2" | head -n1)
+
+export VIDEO_1_URL
+export VIDEO_2_URL
+
+gst-launch-1.0 \
+compositor name=comp background=black \
+sink_0::xpos=0 sink_0::ypos=180 sink_1::xpos=640 sink_1::ypos=180 ! \
+video/x-raw,width=1280,height=720 ! \
+videoconvert ! autovideosink sync=false \
+\
+uridecodebin uri=$VIDEO_1_URL name=src1 \
+src1. ! queue ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! videoconvert ! comp.sink_0 \
+\
+uridecodebin uri=$VIDEO_2_URL name=src2 \
+src2. ! queue ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! videoconvert ! comp.sink_1
+
+
+
+
+

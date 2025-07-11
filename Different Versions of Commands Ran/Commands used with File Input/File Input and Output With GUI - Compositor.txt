@@ -1,0 +1,27 @@
+File Input and Output With GUI - Compositor
+
+export DISPLAY="Your IP Address"
+
+docker run -it --rm \
+  -v /mnt/c/Users/Asus/intel/models:/home/dlstreamer/models \
+  --env MODELS_PATH=/home/dlstreamer/models \
+  --env DISPLAY=$DISPLAY \
+  intel/dlstreamer:latest
+
+
+export DETECTION_MODEL=/home/dlstreamer/models/intel/person-vehicle-bike-detection-2004/FP16/person-vehicle-bike-detection-2004.xml
+export DETECTION_MODEL_PROC=/opt/intel/dlstreamer/samples/gstreamer/model_proc/intel/person-vehicle-bike-detection-2004.json
+
+export VIDEO_1=/home/dlstreamer/models/video1.mp4
+export VIDEO_2=/home/dlstreamer/models/video2.mp4
+
+
+gst-launch-1.0 \
+compositor name=comp sink_0::xpos=0 sink_0::ypos=0 sink_1::xpos=720 sink_1::ypos=0 ! \
+autovideosink sync=false \
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! videoconvert ! comp.sink_0 \
+filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! videoconvert ! comp.sink_1

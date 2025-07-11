@@ -1,0 +1,27 @@
+File Input and Output With GUI -- Intel Exercise
+
+export DISPLAY="Your IP Address"
+
+docker run -it --rm \
+  -v /mnt/c/Users/Asus/intel/models:/home/dlstreamer/models \
+  --env MODELS_PATH=/home/dlstreamer/models \
+  --env DISPLAY=$DISPLAY \
+  intel/dlstreamer:latest
+
+
+export DETECTION_MODEL=/home/dlstreamer/models/intel/person-vehicle-bike-detection-2004/FP16/person-vehicle-bike-detection-2004.xml
+export DETECTION_MODEL_PROC=/opt/intel/dlstreamer/samples/gstreamer/model_proc/intel/person-vehicle-bike-detection-2004.json
+
+export VIDEO_EXAMPLE=/home/dlstreamer/models/sample_video.mp4
+export OUTPUT_VIDEO=/home/dlstreamer/models/output.mp4
+
+export VEHICLE_CLASSIFICATION_MODEL=/home/dlstreamer/models/intel/vehicle-attributes-recognition-barrier-0039/FP16/vehicle-attributes-recognition-barrier-0039.xml
+export VEHICLE_CLASSIFICATION_MODEL_PROC=/opt/intel/dlstreamer/samples/gstreamer/model_proc/intel/vehicle-attributes-recognition-barrier-0039.json
+
+export OUTFILE=/home/dlstreamer/models/pipeline_output.json
+
+gst-launch-1.0 filesrc location=$VIDEO_EXAMPLE ! decodebin ! videoconvert ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvametaconvert format=json ! \
+gvametapublish file-path=/home/dlstreamer/models/output.json file-format=json ! \
+fakesink

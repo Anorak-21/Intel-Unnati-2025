@@ -1,0 +1,28 @@
+Realtime Input and Output With GUI
+
+##Powershell 
+
+yt-dlp -g "Add youtube video link here"
+
+##Ubuntu
+
+export DISPLAY=192.168.1.13:0
+
+docker run -it --rm \
+  -v /mnt/c/Users/Asus/intel/models:/home/dlstreamer/models \
+  --env MODELS_PATH=/home/dlstreamer/models \
+  --env DISPLAY=$DISPLAY \
+  intel/dlstreamer:latest
+
+
+export DETECTION_MODEL=/home/dlstreamer/models/intel/person-vehicle-bike-detection-2004/FP16/person-vehicle-bike-detection-2004.xml
+export DETECTION_MODEL_PROC=/opt/intel/dlstreamer/samples/gstreamer/model_proc/intel/person-vehicle-bike-detection-2004.json
+
+
+gst-launch-1.0 uridecodebin uri="<Enter Link>" ! videoconvert ! \
+gvadetect model=$DETECTION_MODEL  model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvawatermark ! videoconvert ! autovideosink
+
+
+
+
