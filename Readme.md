@@ -125,7 +125,7 @@ gst-launch-1.0 filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! gvadetect 
 ```bash
 gst-launch-1.0 \
 filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! gvafpscounter ! fakesink sync=false filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! gvafpscounter ! fakesink sync=false
-'''
+```
 
 #### 4 Streams (Headless)
 ```bash
