@@ -121,6 +121,18 @@ gst-launch-1.0 compositor name=comp sink_0::xpos=0 sink_1::xpos=640 sink_2::xpos
 gst-launch-1.0 filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! gvafpscounter ! fakesink sync=false
 ```
 
+#### 2 Streams (Headless)
+```bash
+gst-launch-1.0 \
+filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvafpscounter ! fakesink sync=false \
+\
+filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! \
+gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! \
+gvafpscounter ! fakesink sync=false
+
+
 #### 4 Streams (Headless)
 ```bash
 gst-launch-1.0 filesrc location=$VIDEO_1 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! gvawatermark ! gvafpscounter ! fakesink sync=false filesrc location=$VIDEO_2 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! gvafpscounter ! fakesink sync=false filesrc location=$VIDEO_3 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! gvafpscounter ! fakesink sync=false filesrc location=$VIDEO_4 ! decodebin ! videoconvert ! videoscale ! video/x-raw,width=640,height=360 ! gvadetect model=$DETECTION_MODEL model-proc=$DETECTION_MODEL_PROC device=CPU threshold=0.2 ! gvafpscounter ! fakesink sync=false
